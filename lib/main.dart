@@ -1,112 +1,113 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
+
+import 'quiz_score.dart';
+import 'question.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _questions = [
+    {
+      'question': 'What is your favorite programming language?',
+      'answers': [
+        {
+          'answer': 'C++',
+          'score': 9,
+        },
+        {
+          'answer': 'Java',
+          'score': 7,
+        },
+        {
+          'answer': 'Python',
+          'score': 2,
+        },
+      ],
+    },
+    {
+      'question': 'What is your favorite animal?',
+      'answers': [
+        {
+          'answer': 'Cat',
+          'score': 3,
+        },
+        {
+          'answer': 'Dog',
+          'score': 1,
+        },
+        {
+          'answer': 'Snake',
+          'score': 8,
+        },
+      ],
+    },
+    {
+      'question': 'What is your favorite color?',
+      'answers': [
+        {
+          'answer': 'black',
+          'score': 8,
+        },
+        {
+          'answer': 'white',
+          'score': 1,
+        },
+        {
+          'answer': 'pink',
+          'score': 3,
+        },
+      ],
+    },
+  ];
+  var _questionIndex = 0;
+  int _score = 0;
+
+  void _answerQuestion(int score) {
+    setState(() {
+      _questionIndex += 1;
+    });
+
+    _score += score;
+  }
+
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _score = 0;
+    });
+  }
+
+  String get personalityText {
+    if (_score < 8) {
+      return 'You are cool!';
+    } else if (_score < 16) {
+      return 'You are... strange';
+    }
+    return 'You are weird!';
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Startup Name Generator',
+      title: 'Personality Checker',
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: RandomWords(),
-    );
-  }
-}
-
-class RandomWords extends StatefulWidget {
-  const RandomWords({Key? key}) : super(key: key);
-
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-
-  final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Startup Name Generator'),
-        actions: [
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved,)
-        ],
-      ),
-      body: _buildSuggestions(),
-    );
-  }
-
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final tiles = _saved.map(
-                (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = tiles.isNotEmpty
-              ? ListTile.divideTiles(context: context, tiles: tiles).toList()
-              : <Widget>[];
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
+      home: Scaffold(
+          appBar: AppBar(title: const Text('Personality Checker')),
+          body: Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 26),
+              child: _questionIndex < _questions.length
+                  ? Question(_questions, _questionIndex, _answerQuestion)
+                  : QuizScore(personalityText, _resetQuiz),
             ),
-            body: ListView(children: divided),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        if (i.isOdd) return const Divider();
-
-        final index = i ~/ 2;
-        if (index >= _suggestions.length) {
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index]);
-      });
-  }
-
-  Widget _buildRow(WordPair pair) {
-    final alreadySaved = _saved.contains(pair);
-
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
+          )),
     );
   }
 }
-
