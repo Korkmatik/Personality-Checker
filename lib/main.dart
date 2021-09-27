@@ -101,6 +101,7 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
           appBar: AppBar(title: const Text('Personality Checker')),
           body: Center(
+            widthFactor: double.infinity,
             child: Container(
               margin: const EdgeInsets.only(top: 26),
               child: _questionIndex < _questions.length
