@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Question extends StatelessWidget {
 
   final _questions;
-  var _questionIndex = 0;
+  int _questionIndex;
   final Function _answerQuestion;
 
   Question(this._questions, this._questionIndex, this._answerQuestion);
